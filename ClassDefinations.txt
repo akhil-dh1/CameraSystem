@@ -1,0 +1,91 @@
+class User
+- String name
+- long userID
+- String username
+- String password
+
+
+AdminUser extends User
+(responsible for maintaining the camera-system, adding cameras, removing them etc)
+
+abstract Capturable
+- long capturableID
+- String model
+- String name
+- long addedOn
+- long lastUsed
+- boolean isFunctional
+- String maxResolutionSupport
+- boolean isAvailable
+..
+..
+
+
+Camera extends Capturable
+
+
+interface CapturableSystem
+~~~~~~~~~~~~~~~~~~~
+> addCapturable(Capturable)
+> removeCapturable(Capturable)
+
+
+CameraSystem implements CapturableSystem
+- long systemID
+- String name
+- long createdOn
+- boolean isServicable
+- List<Camera> camera
+~~~~~~~~~~~~~~~~~~~
+> addCapturable(Camera)
+> removeCapturable(Camera)
+
+
+interface Callback
+~~~~~~~~~~~~~~
+> onSuccess(CallbackRequest)
+> onFailure(CallbackRequest)
+
+
+
+class CallbackFactory
+~~~~~~~~~~~~~~~~~
+> Callback createCallback(CallbackType)
+
+
+
+BasicCallback implements Callback
+~~~~~~~~~~~~~~~~~~~~~~~
+> onSuccess(CallbackRequest)
+> onFailure(CallbackRequest)
+
+
+(can be creted using BUILDER DESIGN PATTERN)
+class CallbackRequest
+> String errorMsg
+> String successMsg
+> ENUM CallbackType
+(BASIC, OTHERS...)
+
+
+
+CaptureRequest
+- long userID
+- long systemID
+- long cameraID
+- ENUM priority (LOW, MEDIUM, HIGH)
+
+
+CaptureRequestHandler
+~~~~~~~~~~~~~~~~~~
+> responseObject serviceCaptureRequest(CaptureRequest)
+
+
+
+CameraSystemManagementService
+~~~~~~~~~~~~~~~~~~~~~~~~
+> addCamera(adminID, systemID, Camera)
+> removeCamera(adminID, systemID, cameraID)
+> updateCameraMetaData(adminID, systemID, cameraID)
+> updateCameraServicablility(adminID, systemID, cameraID)
+...

@@ -1,0 +1,34 @@
+Functionalities:
+1. Clients can login/register for authentication
+2. Clients can request the camera-system for clicking pictures
+3. Client ask camera system to register success/failure callbacks
+4. Camera system processes the requests asynchronously
+5. Camera system should be able to handle concurrent requests
+6. Camera system should have a way to identify priority requests and prioritize them
+AND clients should have a way to set the priorities for their requests
+7. Control user/client to camera access logic
+
+NOTE: the user will have to wait on the success callback or the failure callback to be invoked.
+so the user will stay connected and waiting for the callback response
+
+
+Assumptions:
+1. There can be multiple cameras and clients are requesting a specific camera each time
+2. There can be a UI that is designed such that before requesting, clients can define their
+custom callbacks using some pre-defined parameters
+
+Here the shared resource is the camera itself, it can only serve one request at a time. But the user
+will be waiting for its request to be served, so the connection needs to be maintained all that time.
+and once the camera is ready to service the request, the response can be sent back!
+> I think from client side they can do HTTP long polling or create a web socket connection.. Long polling
+might be it, as this connection needs to be a per request thing.
+> As for the concurrent requests thing, the shared resource is CAMERA, so the accesses to the camera
+can be sychronized.
+> For prioritizing requests, there can be levels of priority, like three leveled, LOW, MEDIUM, HIGH, or
+or some finite level like from 1 to 10, higher the number higher the priority! But priority should be
+guranteed to be followed given the criticalitiy of this usecase (can be strategy based)
+
+Other requirements:
+> Scalable
+> Highly extensible
+> Fault-tolerant and consistent

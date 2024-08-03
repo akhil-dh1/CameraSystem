@@ -1,0 +1,18 @@
+> If there are multiple requests (> 1) coming for the same camera to capture images, with different
+priority. So all the requests can be queued in a Distributed Messaging System like rabbitMQ or kafka.
+Kafka won't support message prioritization directly, but we can create special topics depending on the 
+request priority (e.g. LOW, MEDIUM, HIGH) and on the consumer side consume the requests first from
+the HIGHEST priority TOPIC and lastly from the LOWEST PRIORITY TOPIC
+OR we can also use RabbitMQ which does support prioritization of messages based on priority value
+
+
+> If there are multiple requests (> 1) coming for the same camera to capture images, with same priority, 
+then we can either go for optimized locking or pessimistic locking. So with each capturable entity, 
+we will maintain in Database, a field isAvailable, that denotes its availability for usage. If no client is
+using it, the flag will be true, else it will be false. By default, the camera will have the flag as true, 
+We will make sure, as soon as a camera is being used the flag is turned to false and once it done using
+its turned back to true.
+So before asking the capturable to capture images, we check if it is available or NOT. We can go for the
+optimisitic locking here, as this usecase might not have that much contention for using a shared resource
+but yeah depending on more situational data, this can be decided.
+We can use MongoDB here for serving the optimistic locking use case here.
