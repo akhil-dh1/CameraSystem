@@ -4,6 +4,7 @@ Kafka won't support message prioritization directly, but we can create special t
 request priority (e.g. LOW, MEDIUM, HIGH) and on the consumer side consume the requests first from
 the HIGHEST priority TOPIC and lastly from the LOWEST PRIORITY TOPIC
 OR we can also use RabbitMQ which does support prioritization of messages based on priority value
+We can maintain another field in the database to know when the process is COMPLETED or FAILED, the process of capturing images by a camera. So we will constantly poll the DB and check this flag whether its been updated or NOT. ONCE its updated, depending on the SUCCESS or FAILURE we can return the result to the user, who anyway would be waiting for the response via HTTP LONG POLLING 
 
 
 > If there are multiple requests (> 1) coming for the same camera to capture images, with same priority, 
@@ -16,3 +17,9 @@ So before asking the capturable to capture images, we check if it is available o
 optimisitic locking here, as this usecase might not have that much contention for using a shared resource
 but yeah depending on more situational data, this can be decided.
 We can use MongoDB here for serving the optimistic locking use case here.
+
+
+There will tables in the DB to capture ongoing transactions/capture activity, like if a userID made a capture request, a requestID will be generated and saved in the DB in some TABLE and the status
+of the capture would be TRACKED from there..
+
+wasn't able to discuss/write on that part owing to time issues
