@@ -68,6 +68,15 @@ class CallbackRequest
 (BASIC, OTHERS...)
 
 
+interface CaptureEngine
+~~~~~~~~~~~~~~~~~~~~~~
+> captureImage(capturableID, systemID)
+
+
+class CameraEngine implements CaptureEngine
+~~~~~~~~~~~~~~~~~~~~~~
+> captureImage(cameraID, systemID)
+
 
 CaptureRequest
 - long userID
