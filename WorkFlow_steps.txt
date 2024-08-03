@@ -1,0 +1,37 @@
+Workflow steps:
+
+1. Client makes a capture request. The request contains the following details:
+    a. user details
+    b. camera id and system id for the request capture action
+    c. callback type
+    d. priority level
+Since the client will be waiting for the response until its ready, the request can be a HTTP long poll
+request. This allows maintaining the client-server connection until the request is served.
+2. The request is authenticated at the gateway (whether its  a logged IN user or not)
+3. Post that the request is routed to the load balancer which fairly directs the request to one of
+the captureRequestHandler service
+4. At CaptureRequestHandler, following happens:
+    4.1 (**OPTIONAL) validates if the user can make a capture request to the mentioned camera.
+this can be supported by maintaining a mapping in the database between userID and cameraID, that 
+means given user has access to mentioned cameraID
+    4.2 Checks the availablility of the mentioned camera by fetching the CAMERA object from Database
+and checking the isAvailable flag
+    4.3 If the camera is available and the request is of the highest priority, capture() method of the 
+captureEngine is called asynchronously via threads and callbacks are added to the async call
+    4.4 else if camera is NOT available or the request is NOT of the higest priority, the request is added
+to a THREAD-SAFE priority queue (like PriorityBlockingQueue) for given cameraID. This queue can 
+be stored in-memory or in a cache like REDIS. But this approach would work well if the camera counts 
+are less, other wise memory issues can come. 
+Other option is to go with kafka based approach which minimizes in memory storage but adds messaging
+overheads to the overall system.
+    4.5 If the capture request is success, the callback will be called and the response will be packaged and
+send back to the client.
+    4.6 If the capture request fails, the callback will be called and the response will be packaged and
+send back to the client.
+5. For concurrent requests, lets say two client requests with id 123, 124 came for the same 
+CAMERA with ID 100. So the request which first accesses the camera from DB can acquire the read/
+write lock immediately, disallowing any read/writes to it, or we can let both the request read from DB
+and see the camera is available. Then both try to change the availability status to false and only the
+first request should be able to do so if optimistic locking is used as it works with resource versioning.
+Any write access to a resource would update its version and subsequent writes are only allowed
+if the version of the read resource is same as the current version of the resource.
